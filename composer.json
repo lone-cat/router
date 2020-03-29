@@ -23,7 +23,10 @@
     "sort-packages": true
   },
   "require": {
-    "php": ">=7.4"
+    "php": ">=7.4",
+    "psr/http-message": "*",
+    "psr/http-server-middleware": "*",
+    "ext-mbstring": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
