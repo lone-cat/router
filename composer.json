@@ -1,0 +1,34 @@
+{
+  "name": "lonecat/router",
+  "description": "Simple router",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Alex Melentev",
+      "email": "alex@melentev.net"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "LoneCat\\Router\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "LoneCat\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  },
+  "scripts": {
+    "test": "phpunit --colors=always"
+  }
+}
