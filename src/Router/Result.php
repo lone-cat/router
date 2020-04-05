@@ -2,18 +2,20 @@
 
 namespace LoneCat\Router\Router;
 
+use Psr\Http\Server\RequestHandlerInterface;
+
 class Result
 {
 
-    protected string $request_handler_name;
+    protected RequestHandlerInterface $request_handler;
     protected array $middlewares;
     protected array $vars;
     private string $name;
 
-    public function __construct(string $name, string $request_handler_name, array $middlewares = [], array $vars = [])
+    public function __construct(string $name, RequestHandlerInterface $request_handler, array $middlewares = [], array $vars = [])
     {
         $this->name = $name;
-        $this->request_handler_name = $request_handler_name;
+        $this->request_handler = $request_handler;
         $this->middlewares = $middlewares;
         $this->vars = $vars;
     }
@@ -23,9 +25,9 @@ class Result
         return $this->name;
     }
 
-    public function getRequestHandlerName(): string
+    public function getRequestHandler(): string
     {
-        return $this->request_handler_name;
+        return $this->request_handler;
     }
 
     public function getVars(): array

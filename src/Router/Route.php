@@ -3,6 +3,7 @@
 namespace LoneCat\Router\Router;
 
 use Exception;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -12,16 +13,16 @@ class Route
     protected string $name;
     protected array $methods;
     protected string $pattern;
-    protected string $handler_classname;
+    protected string $handler;
     protected array $vars = [];
     protected array $middlewares = [];
 
-    public function __construct(string $name, array $methods, string $pattern, string $handler_classname)
+    public function __construct(string $name, array $methods, string $pattern, $handler)
     {
         $this->name = $name;
         $this->methods = $methods;
         $this->pattern = $pattern;
-        $this->handler_classname = $handler_classname;
+        $this->handler = $handler;
     }
 
     public function match(ServerRequestInterface $request): ?Result
@@ -54,18 +55,38 @@ class Route
             */
         }
 
-        return new Result($this->name, $this->getHandler($this->handler_classname), $this->middlewares, $matches);
+        return new Result($this->name, $this->getHandler($this->handler), $this->middlewares, $matches);
     }
 
-    protected function getHandler(string $handler): string
+    protected function getHandler($handler): RequestHandlerInterface
     {
+        if ($handler instanceof RequestHandlerInterface)
+            return $handler;
+
+        if (is_callable($handler)) {
+            return new class() implements RequestHandlerInterface {
+
+                private $handler;
+
+                public function __construct($handler) {
+                    $this->handler = $handler;
+                }
+
+                public function handle(ServerRequestInterface $request): ResponseInterface
+                {
+                    return ($this->handler)($request);
+                }
+
+            };
+        }
+
         if (!class_exists($handler))
             throw new Exception('no route class found');
 
         if (!is_subclass_of($handler, RequestHandlerInterface::class))
             throw new Exception('class is not handler');
 
-        return $handler;
+        return new $handler;
     }
 
     public function addVar(string $name, $type): self
@@ -97,7 +118,7 @@ class Route
 
     public function getHandlerClassName(): string
     {
-        return $this->handler_classname;
+        return $this->handler;
     }
 
     public function getTokens(): array
