@@ -1,6 +1,6 @@
 <?php
 
-namespace LoneCat\Router\Router;
+namespace LoneCat\Router;
 
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -8,10 +8,12 @@ class Router
 {
 
     protected RouteCollection $collection;
+    protected RequestHandlerResolverInterface $resolver;
 
-    public function __construct()
+    public function __construct(RequestHandlerResolverInterface $resolver)
     {
-        $this->collection = new RouteCollection();
+        $this->resolver = $resolver;
+        $this->collection = new RouteCollection($this->resolver);
     }
 
     public function getRouteResult(ServerRequestInterface $request): ?Result
@@ -27,17 +29,17 @@ class Router
         return null;
     }
 
-    public function addGet(string $name, string $pattern, string $handler_classname): Route
+    public function addGet(string $name, string $pattern, $handler): Route
     {
-        return $this->collection->add('GET', $name, $pattern, $handler_classname);
+        return $this->collection->add('GET', $name, $pattern, $handler);
     }
 
-    public function addPost(string $name, string $pattern, string $handler_classname): Route
+    public function addPost(string $name, string $pattern, $handler): Route
     {
-        return $this->collection->add('POST', $name, $pattern, $handler_classname);
+        return $this->collection->add('POST', $name, $pattern, $handler);
     }
 
-    public function addAny(string $name, string $pattern, string $handler_classname): Route
+    public function addAny(string $name, string $pattern, $handler): Route
     {
         return $this->collection->add('ANY', $name, $pattern, $handler_classname);
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace LoneCat\Router\Router;
+namespace LoneCat\Router;
 
 use Exception;
 
@@ -12,8 +12,14 @@ class RouteCollection
                                'ANY',];
 
     protected array $routes = [];
+    protected RequestHandlerResolverInterface $resolver;
+    
+    public function __construct(RequestHandlerResolverInterface $resolver)
+    {
+        $this->resolver = $resolver;
+    }
 
-    public function add($methods, string $name, string $pattern, string $handler_classname): Route
+    public function add($methods, string $name, string $pattern, $handler): Route
     {
         if (is_string($methods))
             $methods = [$methods];
@@ -25,7 +31,7 @@ class RouteCollection
             if (!in_array($method, self::methods, true))
                 throw new Exception('HTTP method "' . $method . '" invalid');
         }
-        $route = new Route($name, $methods, $pattern, $handler_classname);
+        $route = new Route($name, $methods, $pattern, $handler, $this->resolver);
         $this->routes[] = $route;
 
         return $route;

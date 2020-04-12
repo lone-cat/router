@@ -1,6 +1,6 @@
 <?php
 
-namespace LoneCat\Router\Router;
+namespace LoneCat\Router;
 
 class ParsedRouteInfo
 {

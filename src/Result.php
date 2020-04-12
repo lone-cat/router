@@ -1,18 +1,16 @@
 <?php
 
-namespace LoneCat\Router\Router;
-
-use Psr\Http\Server\RequestHandlerInterface;
+namespace LoneCat\Router;
 
 class Result
 {
 
-    protected RequestHandlerInterface $request_handler;
+    protected \Psr\Http\Server\RequestHandlerInterface $request_handler;
     protected array $middlewares;
     protected array $vars;
     private string $name;
 
-    public function __construct(string $name, RequestHandlerInterface $request_handler, array $middlewares = [], array $vars = [])
+    public function __construct(string $name, \Psr\Http\Server\RequestHandlerInterface $request_handler, array $middlewares = [], array $vars = [])
     {
         $this->name = $name;
         $this->request_handler = $request_handler;
@@ -25,7 +23,7 @@ class Result
         return $this->name;
     }
 
-    public function getRequestHandler(): string
+    public function getRequestHandler(): \Psr\Http\Server\RequestHandlerInterface
     {
         return $this->request_handler;
     }
