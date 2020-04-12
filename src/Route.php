@@ -23,6 +23,7 @@ class Route
         $this->methods = $methods;
         $this->pattern = $pattern;
         $this->handler = $handler;
+        $this->resolver = $resolver;
     }
 
     public function match(ServerRequestInterface $request): ?Result
@@ -55,13 +56,13 @@ class Route
             */
         }
 
-        return new Result($this->name, $this->handler, $this->middlewares, $matches);
+        return new Result($this->name, $this->getHandler($this->handler), $this->middlewares, $matches);
     }
     
     protected function getHandler($handler): RequestHandlerInterface {
         if ($handler instanceof RequestHandlerInterface) return $handler;
 
-        return $this->resolver->resolve($middleware);
+        return $this->resolver->resolve($handler);
     }
 
     public function addVar(string $name, $type): self
