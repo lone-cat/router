@@ -2,9 +2,11 @@
 
 namespace LoneCat\Router;
 
+use Psr\Http\Server\RequestHandlerInterface;
+
 interface RequestHandlerResolverInterface
 {
 
-    public function resolve($request_handler_id): \Psr\Http\Server\RequestHandlerInterface;
+    public function resolve($request_handler_id): RequestHandlerInterface;
     
 }

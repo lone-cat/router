@@ -13,11 +13,6 @@ class RouteCollection
 
     protected array $routes = [];
     protected RequestHandlerResolverInterface $resolver;
-    
-    public function __construct(RequestHandlerResolverInterface $resolver)
-    {
-        $this->resolver = $resolver;
-    }
 
     public function add($methods, string $name, string $pattern, $handler): Route
     {
@@ -31,8 +26,13 @@ class RouteCollection
             if (!in_array($method, self::methods, true))
                 throw new Exception('HTTP method "' . $method . '" invalid');
         }
-        $route = new Route($name, $methods, $pattern, $handler, $this->resolver);
-        $this->routes[] = $route;
+        $route = new Route($name, $methods, $pattern, $handler);
+
+        if (isset($this->routes[$name])) {
+            throw new \Exception('Route name already exists!');
+        }
+
+        $this->routes[$name] = $route;
 
         return $route;
     }
@@ -44,9 +44,14 @@ class RouteCollection
             $this->routes,
             function ($val, $key) use ($method) {
                 /** @var Route $val */
-                return in_array($method, $val->getMethods(), true) || in_array('ANY', $val->getMethods(), true);
+                return in_array($method, $val->getMethods(), true)
+                    || in_array('ANY', $val->getMethods(), true);
             },
             ARRAY_FILTER_USE_BOTH);
+    }
+
+    public function getRouteByName(string $name) {
+        return $this->routes[$name];
     }
 
 }

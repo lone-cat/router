@@ -8,7 +8,11 @@ class RouterTest extends TestCase
 {
     public function testConstructor(): void
     {
-        self::assertEquals(2, 2);
+        $router = new \LoneCat\Router\Router(null);
+        $router->addGet('a', '/', 'handler');
+        $router->addGet('a2', '/{id}', 'handler');
+
+        self::assertTrue($router->generateUrl('a2', ['id' => 2]) === '/2');
     }
 
 }

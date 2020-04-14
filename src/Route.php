@@ -15,15 +15,17 @@ class Route
     protected $handler;
     protected array $vars = [];
     protected array $middlewares = [];
-    protected RequestHandlerResolverInterface $resolver;
 
-    public function __construct(string $name, array $methods, string $pattern, $handler, RequestHandlerResolverInterface $resolver)
-    {
+    public function __construct(
+        string $name,
+        array $methods,
+        string $pattern,
+        $handler
+    ) {
         $this->name = $name;
         $this->methods = $methods;
         $this->pattern = $pattern;
         $this->handler = $handler;
-        $this->resolver = $resolver;
     }
 
     public function match(ServerRequestInterface $request): ?Result
@@ -33,12 +35,11 @@ class Route
         $pattern = $result->getRoutePattern();
         $vars = $result->getVars();
 
-        $path = $request->getUri()
-                        ->getPath()
-        ;
+        $path = $request->getUri()->getPath();
 
-        if (!preg_match('{^' . $pattern . '$}ui', $path, $hypo_matches))
+        if (!preg_match('{^' . $pattern . '$}ui', $path, $hypo_matches)) {
             return null;
+        }
 
         $matches = [];
         foreach ($vars as $var_name) {
@@ -46,8 +47,9 @@ class Route
         }
 
         foreach ($matches as $var_name => $var_value) {
-            if (!array_key_exists($var_name, $this->vars))
+            if (!array_key_exists($var_name, $this->vars)) {
                 throw new Exception('no var type passed!');
+            }
 
             /*
             // Check var type
@@ -56,13 +58,18 @@ class Route
             */
         }
 
-        return new Result($this->name, $this->getHandler($this->handler), $this->middlewares, $matches);
+        return new Result($this->name, $this->handler, $this->middlewares, $matches);
     }
-    
-    protected function getHandler($handler): RequestHandlerInterface {
-        if ($handler instanceof RequestHandlerInterface) return $handler;
 
-        return $this->resolver->resolve($handler);
+    public function constructUrl(array $vars) {
+        $result = RouteParser::parse($this->pattern);
+        $route_vars = $result->getVars();
+        $url = $this->pattern;
+        foreach ($route_vars as $route_var) {
+            $url = str_replace('{' . $route_var . '}', $vars[$route_var], $url);
+        }
+
+        return $url;
     }
 
     public function addVar(string $name, $type): self

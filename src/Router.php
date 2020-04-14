@@ -13,7 +13,7 @@ class Router
     public function __construct(RequestHandlerResolverInterface $resolver)
     {
         $this->resolver = $resolver;
-        $this->collection = new RouteCollection($this->resolver);
+        $this->collection = new RouteCollection();
     }
 
     public function getRouteResult(ServerRequestInterface $request): ?Result
@@ -22,11 +22,18 @@ class Router
         $routes = $this->collection->getRoutesByMethod($method);
         foreach ($routes as $route) {
             $result = $route->match($request);
-            if ($result)
+            if ($result) {
+                $result->resolveHandler($this->resolver);
                 return $result;
+            }
         }
 
         return null;
+    }
+
+    public function generateUrl(string $route_name, array $vars): string {
+        $route = $this->collection->getRouteByName($route_name);
+        return $route->constructUrl($vars);
     }
 
     public function addGet(string $name, string $pattern, $handler): Route
@@ -41,7 +48,7 @@ class Router
 
     public function addAny(string $name, string $pattern, $handler): Route
     {
-        return $this->collection->add('ANY', $name, $pattern, $handler_classname);
+        return $this->collection->add('ANY', $name, $pattern, $handler);
     }
 
     public function getRoutesByMethod(string $method)
