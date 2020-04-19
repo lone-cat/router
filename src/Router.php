@@ -16,7 +16,7 @@ class Router
         $this->collection = new RouteCollection();
     }
 
-    public function getRouteResult(ServerRequestInterface $request): ?Result
+    public function getMatchingRouteResult(ServerRequestInterface $request): ?Result
     {
         $method = $request->getMethod();
         $routes = $this->collection->getRoutesByMethod($method);
